@@ -2,14 +2,20 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+
         <link rel="stylesheet" href="style.css">
         <title>tictactoe</title>
     </head>
     <body>
+        <section id="content-wrapper" class="container">
+            <h1>Ho! Ho! Ho! Tic-Tac-Toe!</h1>
+            <div id="ttt-container"></div>
+        </section>
 
-        <div id="ttt-container"></div>
-
-        <script type="module" src="src/tictactoe.js"></script>
+    <script type="module">
+        import {run} from "./src/tictactoe.js";
+        run();
+    </script>
 
     </body>
 </html>

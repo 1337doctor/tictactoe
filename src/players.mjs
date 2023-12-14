@@ -3,11 +3,13 @@ import {gameState} from "./game.mjs";
 const players = [
     {
         id: 1,
-        name: '&#127876;',
+        icon: '&#127876;',
+        name: 'X-Mas Tree',
     },
     {
         id: 2,
-        name: '&#127877;',
+        icon: '&#127877;',
+        name: 'Santa',
     }
 ]
 

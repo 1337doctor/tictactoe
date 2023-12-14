@@ -1,14 +1,13 @@
-import {gameState} from "./game.mjs";
+import {gameState, initGameState} from "./game.mjs";
 import {changePlayer, getPlayerData} from "./players.mjs";
 import {createSquareGameBoard, gameBoard, resetGameBoard, setValueAtOnce} from "./board.mjs";
-import {createGameUI, updateUIField} from "./ui.mjs";
+import {clearUI, createGameUI, updateTotalMovesField, updateUIField, updateWinnerField} from "./ui.mjs";
 import {checkWin} from "./rules.mjs";
-import config from "../config/config.mjs";
-import {listenersInit} from "./listeners.mjs";
+import {run} from "./tictactoe.js";
 
 export const cellClickedHandler = (element, row, col) => {
     element.addEventListener('click', () => {
-        if (!setValueAtOnce(row, col, getPlayerData(gameState.currentPlayerId)?.name) || gameState.won) return;
+        if (!setValueAtOnce(row, col, getPlayerData(gameState.currentPlayerId)?.icon) || gameState.won) return;
         changePlayer();
     })
 }
@@ -19,18 +18,14 @@ export const dataSetChangedCallback = (evt) => {
     const col = evt.detail.col;
     const val = evt.detail.val;
     updateUIField(row, col, val);
+    updateTotalMovesField();
     checkWin(row, col);
 }
 
+export const roundWonCallback = (evt) => {
+    updateWinnerField();
+}
+
 export const resetButtonCallback = () => {
-    if (document.getElementById(config.containerId) !== null) {
-        Array.from(document.getElementById(config.containerId).children).forEach((child)=>child.remove());
-        document.removeEventListener('datasetChanged', dataSetChangedCallback);
-    }
-    gameState.won = false;
-    gameState.winner = null;
-    gameState.currentPlayerId = 1;
-    resetGameBoard();
-    createGameUI();
-    listenersInit();
+    run();
 }

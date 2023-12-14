@@ -1,6 +1,11 @@
 export const gameState = {
-    won: false,
+    won: null,
     winner: null,
-    currentPlayerId: 1,
-    nextPlayerId: 2,
+    currentPlayerId: null,
 };
+
+export const initGameState = () => {
+    gameState.won = false;
+    gameState.winner = null;
+    gameState.currentPlayerId = 1;
+}
