@@ -1,6 +1,6 @@
 import config from '../config/config.mjs';
 import {gameBoard} from "./board.mjs";
-import {cellClickedHandler} from "./callbacks.js";
+import {cellClickedHandler} from "./callbacks.mjs";
 
 const resizeFactor = 100;
 const tableSize = config.boardSize * resizeFactor;

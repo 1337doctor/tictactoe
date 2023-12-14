@@ -1,4 +1,4 @@
-import {dataSetChangedCallback, resetButtonCallback} from "./callbacks.js";
+import {dataSetChangedCallback, resetButtonCallback} from "./callbacks.mjs";
 export const listenersInit = () => {
     document.addEventListener('datasetChanged', dataSetChangedCallback);
     document.addEventListener('roundWon', ()=>{console.log('won!')});
