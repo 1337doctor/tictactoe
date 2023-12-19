@@ -1,5 +1,20 @@
-import config from '../config/config.mjs';
-import {datasetChangedDispatcher} from "./dispatchers.mjs";
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+export interface Props {
+  count?: number
+}
+
+const props = withDefaults(defineProps<Props>(), { count: 0 })
+
+// lifecycle hooks
+onMounted(() => {
+  console.log(`The initial count is ${props.count}.`)
+})
+
+/*
+import config from '../../config/config.mjs';
+import {datasetChangedDispatcher} from "../dispatchers.mjs";
 
 const createInitialRow = () => {
     const row = Array(config.boardSize);
@@ -18,9 +33,7 @@ const createSquareGameBoard = () => {
 
 let gameBoard = createSquareGameBoard();
 
-const getValueAt = (row, col) => {
-    return gameBoard[row][col]
-}
+
 
 const setValueAt = (row, col, val) => {
     gameBoard[row][col] = val;
@@ -33,6 +46,8 @@ const setValueAtOnce = (row, col, val) => {
     setValueAt(row, col, val);
     return true;
 }
+
+
 const getColumn = (col) => {
     if (col - 1 > config.boardSize) {
         throw new Error('Column out of bounds.');
@@ -44,15 +59,6 @@ const getColumn = (col) => {
     return colValues;
 }
 
-const getDiag = (mode) => {
-    if (!(mode === 'ltr' || mode === 'rtl')) return [];
-    const diagValues = Array();
-        for (let i = 0; i < config.boardSize; i++) {
-            const colIndex = mode === 'ltr' ? i : config.boardSize - 1 - i;
-            diagValues.push(gameBoard[i][colIndex]);
-        }
-    return diagValues;
-}
 
 const isOnDiag = (row, col) => {
     return {
@@ -60,12 +66,13 @@ const isOnDiag = (row, col) => {
         rtl: config.boardSize - 1 - col === row,
     }
 }
-const getRow = (row) => {
-    return gameBoard[row];
-}
 
 const resetGameBoard = () => {
     gameBoard = createSquareGameBoard();
 }
 
 export {gameBoard, resetGameBoard, getValueAt, getColumn, getRow, getDiag, setValueAt, setValueAtOnce, isOnDiag, createSquareGameBoard}
+*/
+</script>
+
+<template></template>

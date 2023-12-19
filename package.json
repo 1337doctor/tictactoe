@@ -1,0 +1,44 @@
+{
+  "name": "tictactoe",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "prettier check": "npx prettier --check .",
+    "prettier fix": "npx prettier --write ."
+  },
+  "dependencies": {
+    "vue": "^3.3.11"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "7.6.5",
+    "@storybook/addon-interactions": "7.6.5",
+    "@storybook/addon-links": "7.6.5",
+    "@storybook/blocks": "7.6.5",
+    "@storybook/test": "7.6.5",
+    "@storybook/vue3": "7.6.5",
+    "@storybook/vue3-vite": "7.6.5",
+    "@vitejs/plugin-vue": "^4.5.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sass": "^1.69.5",
+    "storybook": "7.6.5",
+    "vite": "^5.0.8",
+    "vuex": "^4.1.0"
+  },
+  "main": "main.ts",
+  "repository": "https://github.com/h4x0r-tech/tictactoe.git",
+  "author": "Chris R.",
+  "license": "MIT",
+  "resolutions": {
+    "jackspeak": "2.1.1"
+  }
+}

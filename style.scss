@@ -1,0 +1,42 @@
+html,
+body {
+  width: 100%;
+}
+
+body {
+  background-color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  font-family: 'Brush Script MT';
+  text-align: center;
+  position: relative;
+}
+
+h1:before,
+h1:after {
+  display: inline-block;
+  position: absolute;
+  content: '❆';
+  color: #0088a8;
+  top: -4px;
+}
+
+h1:before {
+  left: 0;
+}
+
+h1:after {
+  right: 0;
+}
+
+.container {
+  margin: auto;
+  max-width: 1960px;
+  display: grid;
+}
+
+#ttt-container table {
+  margin: auto;
+}
