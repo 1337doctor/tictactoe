@@ -2,11 +2,7 @@ import { createStore } from 'vuex'
 import mutations from './mutations'
 import getters from './getters'
 import actions from './actions'
-import {BoardSizeRange, PlayerData, State} from '../types'
-import { createSquareGameBoard } from '../helpers'
-
-const initialBoardSize: BoardSizeRange = 3
-
+import { PlayerData, State } from '../types'
 
 const players: PlayerData = [
   {
@@ -22,10 +18,8 @@ const players: PlayerData = [
 ]
 
 const initialState: State = {
-  gameBoardSize: initialBoardSize,
-  gameBoard: createSquareGameBoard(initialBoardSize),
   players,
-  currentPlayerId: 1
+  currentPlayerId: 1,
 }
 export const store = createStore({
   state() {

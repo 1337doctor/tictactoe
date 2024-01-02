@@ -1,12 +1,9 @@
-import {BoardSizeRange, GameBoardData, NonEmptyArray} from "../types";
+import {BoardSizeRange, GameBoardData, GameBoardRow} from "../types";
 
-export const createSquareGameBoard: GameBoardData = (boardSize: BoardSizeRange) => {
+export const createSquareGameBoard: (boardSize: BoardSizeRange)=>GameBoardData = (boardSize: BoardSizeRange) => {
   const gameBoard: GameBoardData = Array(boardSize)
   for (let i = 0; i < boardSize; i++) {
-    let row: NonEmptyArray = Array(boardSize)
-    for (let i = 0; i < boardSize; i++) {
-      row[i] = null
-    }
+    const row: GameBoardRow = Array(boardSize).fill(null)
     gameBoard[i] = row
   }
   return gameBoard

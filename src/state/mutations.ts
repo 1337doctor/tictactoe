@@ -1,11 +1,7 @@
-import {CellClickedPayload, GameBoardData, Player, State} from '../types'
+import {Player, State} from '../types'
 
 export default {
-  setGameBoardData: (state: State, gameBoard: GameBoardData) =>
-    (state.gameBoard = gameBoard),
-  setGameBoardDataValueAt: (state: State, ep: CellClickedPayload) => {
-    state.gameBoard[ep.pos.row][ep.pos.col] = ep.playerId;
-  },
+  resetCurrentPlayer: (state: State) => state.currentPlayerId = state.players[0]?.id,
   changePlayer: (state: State) => {
     const playerIndex: number = state.players
         .map((player: Player) => player.id)
