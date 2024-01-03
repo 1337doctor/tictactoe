@@ -57,6 +57,8 @@ interface Props {
 interface Emits {
   (e: 'roundWon', ep: RoundWonPayload): void
 
+  (e: 'roundDraw', ep: RoundWonPayload): void
+
   (e: 'boardDiagnostics', ep: BoardDiagnosticsPayload): void
 
   (e: 'changePlayer'): void
@@ -70,21 +72,22 @@ const emit = defineEmits<Emits>()
 const gameBoardData = ref<GameBoardData>(createSquareGameBoard(3))
 const gameBoardRowCount = gameBoardData.value.length
 const currentPosition = ref<Pos>({ row: null, col: null })
-const eliminatedRows = ref<Array<boolean>>(Array(gameBoardRowCount))
 const eliminatedCols = ref<Array<boolean>>(Array(gameBoardRowCount))
 const eliminatedDiag = ref<Array<boolean>>(Array(2))
+const eliminatedRows = ref<Array<boolean>>(Array(gameBoardRowCount))
 
 onMounted(() => {
   initWinningConditions()
+  emitBoardDiagnostics()
 })
 
 watch(
   gameBoardData,
   () => {
-    console.log('aua')
     if (!allDiagEliminated.value) diagWinLookahead()
     if (!allRowsEliminated.value) rowsWinLookAhead()
     if (!allColsEliminated.value) colsWinLookAhead()
+    emitBoardDiagnostics()
   },
   { deep: true },
 )
@@ -96,48 +99,17 @@ watch(
   },
 )
 
-const allDiagEliminated = computed<boolean>(() =>
-  eliminatedDiag.value.every((element) => element === true),
-)
-const allRowsEliminated = computed<boolean>(() =>
-  eliminatedRows.value.every((element) => element === true),
-)
 const allColsEliminated = computed<boolean>(() =>
   eliminatedCols.value.every((element) => element === true),
 )
 
-const isWinningPossible = computed<boolean>(
-  () => !draw.value
+const allDiagEliminated = computed<boolean>(() =>
+  eliminatedDiag.value.every((element) => element === true),
 )
 
-const winConditionCount = computed<number>(
-  () =>
-    [
-      ...eliminatedDiag.value,
-      ...eliminatedRows.value,
-      ...eliminatedCols.value,
-    ].filter((element) => element === false).length,
+const allRowsEliminated = computed<boolean>(() =>
+  eliminatedRows.value.every((element) => element === true),
 )
-
-const movesLeft = computed(
-  () => gameBoardData.value.flat().filter((element) => element === null).length,
-)
-const draw = computed(() => winConditionCount.value < 2)
-const currentRowData = computed<GameBoardRow>(() =>
-  getRowAt(currentPosition.value.row || 0),
-)
-const currentColData = computed<GameBoardRow>(() =>
-  getColAt(currentPosition.value.col || 0),
-)
-const currentDiagonalData = computed<GameBoardData>(() => {
-  const ltr: GameBoardRow = Array()
-  const rtl: GameBoardRow = Array()
-  for (let i = 0; i < gameBoardRowCount; i++) {
-    ltr.push(gameBoardData.value[i][i])
-    rtl.push(gameBoardData.value[i][gameBoardRowCount - 1 - i])
-  }
-  return Array<GameBoardRow>(ltr, rtl)
-})
 
 const currentCellData = computed<PlayerId>({
   get: () =>
@@ -149,9 +121,46 @@ const currentCellData = computed<PlayerId>({
       pid
   },
 })
+
+const currentColData = computed<GameBoardRow>(() =>
+  getColAt(currentPosition.value.col || 0),
+)
+
+const currentDiagonalData = computed<GameBoardData>(() => {
+  const ltr: GameBoardRow = Array()
+  const rtl: GameBoardRow = Array()
+  for (let i = 0; i < gameBoardRowCount; i++) {
+    ltr.push(gameBoardData.value[i][i])
+    rtl.push(gameBoardData.value[i][gameBoardRowCount - 1 - i])
+  }
+  return Array<GameBoardRow>(ltr, rtl)
+})
+
 const currentPlayerData = computed<Player>(() =>
   getPlayerDataForCell(currentPosition.value.row, currentPosition.value.col),
 )
+
+const currentRowData = computed<GameBoardRow>(() =>
+  getRowAt(currentPosition.value.row || 0),
+)
+
+const draw = computed(() => winConditionCount.value < 2)
+
+const isWinningPossible = computed<boolean>(() => !draw.value && !won.value)
+
+const movesLeft = computed(
+  () => gameBoardData.value.flat().filter((element) => element === null).length,
+)
+
+const winConditionCount = computed<number>(
+  () =>
+    [
+      ...eliminatedDiag.value,
+      ...eliminatedRows.value,
+      ...eliminatedCols.value,
+    ].filter((element) => element === false).length,
+)
+
 const won = computed<boolean>(() => {
   return (
     isFullRow(currentRowData.value) ||
@@ -162,63 +171,31 @@ const won = computed<boolean>(() => {
 })
 
 const cellClickHandler: RoundWonHandler = (ep: RoundWonPayload) => {
-  if (won.value) return false
+  if (won.value || draw.value) return false
   currentPosition.value = { row: ep.pos.row, col: ep.pos.col }
   if (currentCellData.value) return false
   currentCellData.value = props.currentPlayer.id
-  if (!won.value) {
-    emit('changePlayer')
-  } else {
+  if (won.value) {
     emit('roundWon', {
       pos: currentPosition.value,
       playerId: currentPlayerData.value.id,
     })
+  } else if (draw.value) {
+    emit('roundDraw', {
+      pos: currentPosition.value,
+      playerId: currentPlayerData.value.id,
+    })
+  } else {
+    emit('changePlayer')
   }
 }
-const getPlayerDataForCell = (row: number, col: number) => {
-  if (row === null || col === null) return null
-  const [firstEntry] = props.playerData.filter(
-    (player: Player) => gameBoardData.value[row][col] === player.id,
-  )
-  return firstEntry
-}
-const isFullRow = (dataSet: GameBoardRow) => {
-  for (let i = 1; i < dataSet.length; i++) {
-    if (dataSet[i - 1] === null || dataSet[i - 1] !== dataSet[i]) return false
-  }
-  return true
-}
-const isFullRowPossible = (dataSet: GameBoardRow) => {
-  const noEmptyFields = dataSet.filter((entry) => entry !== null)
-  for (let i = 1; i < noEmptyFields.length; i++) {
-    if (noEmptyFields[i - 1] !== noEmptyFields[i]) return false
-  }
-  return true
-}
-const getValueAt = (pos: Pos) => {
-  return gameBoardData.value[pos.row][pos.col]
-}
-const getRowAt = (row: number) => {
-  return gameBoardData.value[row]
-}
-const getColAt = (col: number) => {
-  const colValues: Array<PlayerId> = Array(gameBoardRowCount)
-  for (let i = 0; i < gameBoardRowCount; i++) {
-    colValues[i] = getValueAt({ row: i, col })
-  }
-  return colValues
-}
-const rowsWinLookAhead: () => void = () => {
-  for (let i = 0; i < gameBoardRowCount; i++) {
-    eliminatedRows.value[i] = !isFullRowPossible(getRowAt(i))
-  }
-}
+
 const colsWinLookAhead: () => void = () => {
   for (let i = 0; i < gameBoardRowCount; i++) {
-    console.log('hallo', isFullRowPossible(getColAt(i)))
     eliminatedCols.value[i] = !isFullRowPossible(getColAt(i))
   }
 }
+
 const diagWinLookahead: () => void = () => {
   let diagLtrPossible = false
   let diagRtlPossible = false
@@ -233,14 +210,61 @@ const diagWinLookahead: () => void = () => {
   }
 }
 
+const emitBoardDiagnostics = () => {
+  emit('boardDiagnostics', {
+    movesLeft: movesLeft.value,
+    winConditionCount: winConditionCount.value,
+    draw: draw.value,
+  })
+}
+
+const getColAt = (col: number) => {
+  const colValues: Array<PlayerId> = Array(gameBoardRowCount)
+  for (let i = 0; i < gameBoardRowCount; i++) {
+    colValues[i] = getValueAt({ row: i, col })
+  }
+  return colValues
+}
+
+const getPlayerDataForCell = (row: number, col: number) => {
+  if (row === null || col === null) return null
+  const [firstEntry] = props.playerData.filter(
+    (player: Player) => gameBoardData.value[row][col] === player.id,
+  )
+  return firstEntry
+}
+
+const getRowAt = (row: number) => {
+  return gameBoardData.value[row]
+}
+
+const getValueAt = (pos: Pos) => {
+  return gameBoardData.value[pos.row][pos.col]
+}
+
+const initBoard = () => {
+  gameBoardData.value = createSquareGameBoard(3)
+}
+
 const initWinningConditions = () => {
   eliminatedRows.value = Array(gameBoardRowCount).fill(false)
   eliminatedCols.value = Array(gameBoardRowCount).fill(false)
   eliminatedDiag.value = Array(2).fill(false)
 }
 
-const initBoard = () => {
-  gameBoardData.value = createSquareGameBoard(3)
+const isFullRow = (dataSet: GameBoardRow) => {
+  for (let i = 1; i < dataSet.length; i++) {
+    if (dataSet[i - 1] === null || dataSet[i - 1] !== dataSet[i]) return false
+  }
+  return true
+}
+
+const isFullRowPossible = (dataSet: GameBoardRow) => {
+  const noEmptyFields = dataSet.filter((entry) => entry !== null)
+  for (let i = 1; i < noEmptyFields.length; i++) {
+    if (noEmptyFields[i - 1] !== noEmptyFields[i]) return false
+  }
+  return true
 }
 
 const reset = () => {
@@ -249,63 +273,11 @@ const reset = () => {
   emit('resetted')
 }
 
-/*
-*
-const win = (dataSet) => {
-  for (let i = 1; i < dataSet.length; i++) {
-    if (dataSet[i - 1] === null || dataSet[i - 1] !== dataSet[i]) return false
-  }
-  return true
-}
-
-export const checkWin = (row, col) => {
-  const diag = Array()
-  const { ltr, rtl } = isOnDiag(row, col)
-  const values = [gameBoardRow(row), gameBoardColumn(col)]
-  if (ltr) values.push(gameBoardDiag('ltr'))
-  if (rtl) values.push(gameBoardDiag('rtl'))
-
-  for (let i = 0; i < values.length; i++) {
-    const dataset = values[i]
-    if (win(dataset)) {
-      //gameState.winner = gameState.currentPlayerId
-      //gameState.won = true
-      return true
-    }
-  }
-  return false
-}
-
-const gameBoardValueAt = (row: number, col: number) => gameBoardData[row][col]
-const gameBoardRow =  (row: number) => gameBoardData[row]
-const gameBoardDiag:  (mode: DiagonalMode) => Array<PlayerId> = (mode: DiagonalMode) => {
-  if (!isDiagonalMode(mode)) return [null, null, null]
-  const diagValues: GameBoardRow = Array()
+const rowsWinLookAhead: () => void = () => {
   for (let i = 0; i < gameBoardRowCount; i++) {
-    const colIndex = mode === 'ltr' ? i : gameBoardRowCount - 1 - i
-    diagValues.push(gameBoardData[i][colIndex])
-  }
-  return diagValues
-}
-const gameBoardColumn: (col: number) => Array<PlayerId> = (col: number) => {
-  if (col - 1 > gameBoardRowCount) {
-    return [null, null, null]
-  }
-  const colValues: Array<PlayerId> = Array(gameBoardRowCount);
-  for (let i = 0; i <  gameBoardRowCount; i++) {
-    colValues[i] =  gameBoardData[i][col];
-  }
-  return colValues;
-}
-const isOnDiag = (row: number, col: number) => {
-  return {
-    ltr: row === col,
-    rtl: gameBoardRowCount - 1 - col === row,
+    eliminatedRows.value[i] = !isFullRowPossible(getRowAt(i))
   }
 }
-
-*
-* */
 </script>
 
 <style lang="scss">

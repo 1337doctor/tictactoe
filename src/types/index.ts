@@ -13,7 +13,7 @@ export type PlayerData = Array<Player>
 export type GameBoardRow = Array<PlayerId>
 export type GameBoardData = Array<GameBoardRow>
 export type RoundWonPayload = { pos: Pos; playerId: PlayerId }
-export type BoardDiagnosticsPayload = {movesLeft: number, possibleWinConditions: number, draw: boolean}
+export type BoardDiagnosticsPayload = {movesLeft: number, winConditionCount: number, draw: boolean}
 export type RoundWonHandler = (ep: RoundWonPayload) => void;
 
 export interface State {

@@ -1,0 +1,1 @@
+.ttt-game{display:table}.ttt-game .ttt-row{display:table-row}.ttt-game .ttt-row .ttt-col{display:table-cell}.ttt-game .ttt-row .ttt-col .btn-cell{width:100px;height:100px;position:relative;overflow:hidden}.ttt-game .ttt-row .ttt-col .btn-cell .ttt-caption{position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;font-size:60px}
