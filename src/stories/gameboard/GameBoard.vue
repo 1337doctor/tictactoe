@@ -34,6 +34,9 @@
 </template>
 
 <script setup lang="ts">
+
+const GAME_BOARD_SIZE: number = 5;
+
 import {
   RoundWonPayload,
   RoundWonHandler,
@@ -69,7 +72,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const gameBoardData = ref<GameBoardData>(createSquareGameBoard(3))
+const gameBoardData = ref<GameBoardData>(createSquareGameBoard(GAME_BOARD_SIZE))
 const gameBoardRowCount = gameBoardData.value.length
 const currentPosition = ref<Pos>({ row: null, col: null })
 const eliminatedCols = ref<Array<boolean>>(Array(gameBoardRowCount))
@@ -144,7 +147,7 @@ const currentRowData = computed<GameBoardRow>(() =>
   getRowAt(currentPosition.value.row || 0),
 )
 
-const draw = computed(() => winConditionCount.value < 2)
+const draw = computed(() => winConditionCount.value < 2 && !won.value)
 
 const isWinningPossible = computed<boolean>(() => !draw.value && !won.value)
 
@@ -243,7 +246,7 @@ const getValueAt = (pos: Pos) => {
 }
 
 const initBoard = () => {
-  gameBoardData.value = createSquareGameBoard(3)
+  gameBoardData.value = createSquareGameBoard(GAME_BOARD_SIZE)
 }
 
 const initWinningConditions = () => {

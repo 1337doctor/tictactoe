@@ -15,6 +15,11 @@ const players: PlayerData = [
     icon: '&#127877;',
     name: 'Santa',
   },
+  {
+    id: 3,
+    icon: '🦌',
+    name: 'Rudolph',
+  }
 ]
 
 const initialState: State = {
